@@ -20,7 +20,7 @@ export const getInvoices = async (req: Request, res: Response): Promise<void> =>
 export const getInvoiceById = async (req: Request, res: Response): Promise<void> => {
   try {
     const invoice = await prisma.invoice.findUnique({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       include: {
         customer: true,
         challan: {
