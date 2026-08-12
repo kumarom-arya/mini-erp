@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  role      String   // "ADMIN", "SALES", "WAREHOUSE", "ACCOUNTS"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  challans      Challan[]
+  stockMovements StockMovement[]
+  invoices      Invoice[]
+  payments      Payment[]
+  
+  editRequestsRequested ChallanEditRequest[] @relation("RequestedEdits")
+  editRequestsResolved  ChallanEditRequest[] @relation("ResolvedEdits")
+}
+
+model Customer {
+  id           Int      @id @default(autoincrement())
+  name         String
+  mobile       String
+  email        String?
+  businessName String?
+  gstNumber    String?
+  type         String   // "RETAIL", "WHOLESALE", "DISTRIBUTOR"
+  address      String?
+  status       String   @default("ACTIVE") // "LEAD", "ACTIVE", "INACTIVE"
+  followUpDate DateTime?
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  challans Challan[]
+  invoices Invoice[]
+}
+
+model Product {
+  id             Int      @id @default(autoincrement())
+  name           String
+  sku            String   @unique
+  category       String
+  unitPrice      Float
+  currentStock   Int      @default(0)
+  minStockAlert  Int      @default(0)
+  location       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  stockMovements StockMovement[]
+}
+
+model StockMovement {
+  id           Int      @id @default(autoincrement())
+  productId    Int
+  product      Product  @relation(fields: [productId], references: [id])
+  quantity     Int      // Change in quantity
+  movementType String   // "IN" or "OUT"
+  reason       String?
+  createdById  Int
+  createdBy    User     @relation(fields: [createdById], references: [id])
+  timestamp    DateTime @default(now())
+}
+
+model Challan {
+  id           Int      @id @default(autoincrement())
+  challanNo    String   @unique
+  customerId   Int
+  customer     Customer @relation(fields: [customerId], references: [id])
+  totalQty     Int
+  status       String   @default("DRAFT") // "DRAFT", "CONFIRMED", "CANCELLED"
+  createdById  Int
+  createdBy    User     @relation(fields: [createdById], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  items        ChallanItem[]
+  invoice      Invoice?
+  editRequests ChallanEditRequest[]
+}
+
+model ChallanItem {
+  id             Int      @id @default(autoincrement())
+  challanId      Int
+  challan        Challan  @relation(fields: [challanId], references: [id])
+  productId      Int
+  quantity       Int
+  
+  // Snapshot data as requested in requirements:
+  // "Challan should store product snapshot data, not only product ID."
+  productName    String
+  productSku     String
+  unitPrice      Float
+}
+
+model Invoice {
+  id           Int      @id @default(autoincrement())
+  invoiceNo    String   @unique
+  challanId    Int?     @unique
+  challan      Challan? @relation(fields: [challanId], references: [id])
+  customerId   Int
+  customer     Customer @relation(fields: [customerId], references: [id])
+  totalAmount  Float
+  taxAmount    Float    @default(0)
+  discount     Float    @default(0)
+  grandTotal   Float
+  status       String   @default("UNPAID") // "UNPAID", "PARTIAL", "PAID", "CANCELLED"
+  dueDate      DateTime?
+  createdById  Int
+  createdBy    User     @relation(fields: [createdById], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  payments     Payment[]
+}
+
+model Payment {
+  id           Int      @id @default(autoincrement())
+  invoiceId    Int
+  invoice      Invoice  @relation(fields: [invoiceId], references: [id])
+  amount       Float
+  paymentMode  String   // "CASH", "BANK_TRANSFER", "UPI", "CHEQUE"
+  referenceNo  String?
+  paymentDate  DateTime @default(now())
+  createdById  Int
+  createdBy    User     @relation(fields: [createdById], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+model ChallanEditRequest {
+  id           Int      @id @default(autoincrement())
+  challanId    Int
+  challan      Challan  @relation(fields: [challanId], references: [id])
+  proposedData String   // JSON string of proposed items
+  status       String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  requestedById Int
+  requestedBy   User    @relation("RequestedEdits", fields: [requestedById], references: [id])
+  resolvedById  Int?
+  resolvedBy    User?   @relation("ResolvedEdits", fields: [resolvedById], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Settings {
+  id           Int      @id @default(autoincrement())
+  companyName  String
+  address      String
+  phone        String?
+  email        String?
+  gstNumber    String?
+  logoUrl      String?
+  updatedAt    DateTime @updatedAt
+}

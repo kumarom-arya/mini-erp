@@ -1,0 +1,85 @@
+import { Request, Response } from 'express';
+import { prisma } from '../prisma';
+
+export const getPayments = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const payments = await prisma.payment.findMany({
+      include: {
+        invoice: {
+          include: {
+            customer: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(payments);
+  } catch (error: any) {
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+};
+
+export const createPayment = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { invoiceId, amount, paymentMode, referenceNo } = req.body;
+    const userId = (req as any).user?.id; 
+
+    if (!userId) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const invoice = await prisma.invoice.findUnique({
+      where: { id: invoiceId },
+      include: { payments: true }
+    });
+
+    if (!invoice) {
+      res.status(404).json({ error: 'Invoice not found' });
+      return;
+    }
+
+    const paymentAmount = parseFloat(amount);
+    const totalPaidSoFar = invoice.payments.reduce((sum, p) => sum + p.amount, 0);
+    const remainingBalance = invoice.grandTotal - totalPaidSoFar;
+
+    if (paymentAmount <= 0) {
+      res.status(400).json({ error: 'Payment amount must be greater than zero' });
+      return;
+    }
+
+    // Rounding safety check for JS float math
+    if (paymentAmount > Number(remainingBalance.toFixed(2))) {
+      res.status(400).json({ error: `Payment amount cannot exceed the remaining balance of $${remainingBalance.toFixed(2)}` });
+      return;
+    }
+
+    const payment = await prisma.payment.create({
+      data: {
+        invoiceId,
+        amount: parseFloat(amount),
+        paymentMode,
+        referenceNo,
+        createdById: userId,
+      },
+    });
+
+    // Update invoice status based on total payments
+    const allPayments = [...invoice.payments, payment];
+    const totalPaid = allPayments.reduce((sum, p) => sum + p.amount, 0);
+
+    let newStatus = 'PARTIAL';
+    if (totalPaid >= invoice.grandTotal) {
+      newStatus = 'PAID';
+    }
+
+    await prisma.invoice.update({
+      where: { id: invoiceId },
+      data: { status: newStatus }
+    });
+
+    res.status(201).json(payment);
+  } catch (error: any) {
+    res.status(400).json({ error: 'Failed to create payment', details: error.message });
+  }
+};
