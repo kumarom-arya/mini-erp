@@ -27,7 +27,7 @@ const Login = () => {
       login(response.data.user, response.data.token);
       navigate('/');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed');
+      setError(err.response?.data?.error || err.message || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -35,10 +35,10 @@ const Login = () => {
 
   const handleSeed = async () => {
     try {
-      await api.post('/auth/seed');
-      alert('Users seeded successfully. You can now login with role name (e.g. admin, sales) and password: password123');
+      const res = await api.post('/auth/seed');
+      alert(res.data?.message || 'Users seeded successfully. You can now login with username: admin and password: password123');
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Seeding failed');
+      alert(err.response?.data?.error || err.message || 'Seeding failed');
     }
   };
 
