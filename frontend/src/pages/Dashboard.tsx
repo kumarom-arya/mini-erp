@@ -1,7 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Users, Package, FileText, DollarSign, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Users, Package, FileText, TrendingUp, AlertTriangle, IndianRupee } from 'lucide-react';
 import api from '../services/api';
+
+const StatCard = ({ icon, iconBg, iconColor, label, value, delay }: {
+  icon: React.ReactNode; iconBg: string; iconColor: string; label: string; value: string; delay: number;
+}) => (
+  <div
+    className="stat-card"
+    style={{ animation: `fadeInUp 0.5s var(--ease-out) ${delay}s both` }}
+  >
+    <div className="stat-icon" style={{ background: iconBg, color: iconColor }}>
+      {icon}
+    </div>
+    <div style={{ overflow: 'hidden', flex: 1 }}>
+      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.15rem' }}>
+        {label}
+      </div>
+      <div style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        {value}
+      </div>
+    </div>
+  </div>
+);
+
+const SkeletonCards = () => (
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+    {[1,2,3,4].map(i => (
+      <div key={i} className="skeleton skeleton-card" style={{ height: '90px' }} />
+    ))}
+  </div>
+);
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -22,95 +51,122 @@ const Dashboard = () => {
     fetchAnalytics();
   }, []);
 
-  if (loading) return <div>Loading dashboard...</div>;
-  if (!data) return <div>Failed to load data</div>;
+  if (loading) return (
+    <div>
+      <div className="skeleton skeleton-text" style={{ width: '300px', height: '2rem', marginBottom: '0.5rem' }} />
+      <div className="skeleton skeleton-text" style={{ width: '400px', height: '1rem', marginBottom: '2rem' }} />
+      <SkeletonCards />
+      <div className="skeleton" style={{ height: '200px', marginTop: '2rem', borderRadius: 'var(--radius-xl)' }} />
+    </div>
+  );
+
+  if (!data) return (
+    <div className="empty-state">
+      <AlertTriangle size={48} style={{ opacity: 0.3, margin: '0 auto 1rem' }} />
+      <p>Failed to load dashboard data. Please refresh.</p>
+    </div>
+  );
 
   return (
     <div>
-      <h1 style={{ marginBottom: '0.5rem' }}>Welcome back, {user?.username}</h1>
-      <p className="text-muted" style={{ marginBottom: '2rem' }}>Here's what's happening with your operations today.</p>
-      
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-        
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', overflow: 'hidden' }}>
-          <div style={{ padding: '1rem', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderRadius: 'var(--radius-full)', color: '#10B981', flexShrink: 0 }}>
-            <TrendingUp size={28} />
-          </div>
-          <div style={{ overflow: 'hidden' }}>
-            <h3 style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Total Revenue</h3>
-            <p style={{ margin: 0, fontSize: '1.35rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
-              ₹{data.financial.totalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-          </div>
-        </div>
-
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', overflow: 'hidden' }}>
-          <div style={{ padding: '1rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 'var(--radius-full)', color: '#EF4444', flexShrink: 0 }}>
-            <DollarSign size={28} />
-          </div>
-          <div style={{ overflow: 'hidden' }}>
-            <h3 style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Outstanding Amount</h3>
-            <p style={{ margin: 0, fontSize: '1.35rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
-              ₹{data.financial.outstandingAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-          </div>
-        </div>
-
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', overflow: 'hidden' }}>
-          <div style={{ padding: '1rem', backgroundColor: 'var(--color-primary-light)', borderRadius: 'var(--radius-full)', color: 'var(--color-primary)', flexShrink: 0 }}>
-            <Users size={28} />
-          </div>
-          <div style={{ overflow: 'hidden' }}>
-            <h3 style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Total Customers</h3>
-            <p style={{ margin: 0, fontSize: '1.35rem', fontWeight: 700, whiteSpace: 'nowrap' }}>{data.totalCustomers}</p>
-          </div>
-        </div>
-
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', overflow: 'hidden' }}>
-          <div style={{ padding: '1rem', backgroundColor: '#D1FAE5', borderRadius: 'var(--radius-full)', color: '#059669', flexShrink: 0 }}>
-            <FileText size={28} />
-          </div>
-          <div style={{ overflow: 'hidden' }}>
-            <h3 style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Challans Generated</h3>
-            <p style={{ margin: 0, fontSize: '1.35rem', fontWeight: 700, whiteSpace: 'nowrap' }}>{data.totalChallans}</p>
-          </div>
-        </div>
+      {/* Welcome Header */}
+      <div style={{ marginBottom: '1.75rem' }}>
+        <h1 style={{ marginBottom: '0.25rem' }}>Welcome back, {user?.username}</h1>
+        <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>
+          Here's what's happening with your operations today.
+        </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
-        <div>
-          <div className="flex align-center gap-2 mb-4" style={{ color: 'var(--color-danger)', paddingLeft: '0.5rem' }}>
-            <AlertTriangle size={20} />
-            <h2 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--color-text-main)' }}>Low Stock Alerts</h2>
+      {/* Stat Cards Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+        <StatCard
+          icon={<TrendingUp size={22} />}
+          iconBg="rgba(16, 185, 129, 0.12)"
+          iconColor="#10B981"
+          label="Total Revenue"
+          value={`₹${data.financial.totalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          delay={0.05}
+        />
+        <StatCard
+          icon={<IndianRupee size={22} />}
+          iconBg="rgba(239, 68, 68, 0.12)"
+          iconColor="#EF4444"
+          label="Outstanding Amount"
+          value={`₹${data.financial.outstandingAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          delay={0.1}
+        />
+        <StatCard
+          icon={<Users size={22} />}
+          iconBg="var(--primary-light)"
+          iconColor="var(--primary)"
+          label="Total Customers"
+          value={data.totalCustomers.toString()}
+          delay={0.15}
+        />
+        <StatCard
+          icon={<FileText size={22} />}
+          iconBg="rgba(6, 182, 212, 0.12)"
+          iconColor="#06B6D4"
+          label="Challans Generated"
+          value={data.totalChallans.toString()}
+          delay={0.2}
+        />
+      </div>
+
+      {/* Low Stock Alerts */}
+      <div style={{ animation: 'fadeInUp 0.5s var(--ease-out) 0.25s both' }}>
+        <div className="flex align-center gap-3 mb-4">
+          <div style={{
+            padding: '0.5rem',
+            background: 'var(--danger-light)',
+            borderRadius: 'var(--radius-md)',
+            color: 'var(--danger)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <AlertTriangle size={18} />
           </div>
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>SKU</th>
-                  <th>Product Name</th>
-                  <th>Location</th>
-                  <th>Current Stock</th>
-                  <th>Min Alert Level</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.lowStockProducts.length === 0 ? (
-                  <tr><td colSpan={5} style={{ textAlign: 'center' }}>No low stock alerts</td></tr>
-                ) : (
-                  data.lowStockProducts.map((product: any) => (
-                    <tr key={product.id}>
-                      <td style={{ fontWeight: 600 }}>{product.sku}</td>
-                      <td>{product.name}</td>
-                      <td>{product.location || 'N/A'}</td>
-                      <td style={{ fontWeight: 'bold', color: '#EF4444' }}>{product.currentStock}</td>
-                      <td>{product.minStockAlert}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+          <h2 style={{ margin: 0, fontSize: '1.15rem' }}>Low Stock Alerts</h2>
+          {data.lowStockProducts.length > 0 && (
+            <span className="badge badge-danger" style={{ marginLeft: '0.25rem' }}>
+              {data.lowStockProducts.length}
+            </span>
+          )}
+        </div>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Product Name</th>
+                <th>Location</th>
+                <th>Current Stock</th>
+                <th>Min Alert Level</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.lowStockProducts.length === 0 ? (
+                <tr><td colSpan={5} className="text-center" style={{ padding: '2rem', color: 'var(--text-muted)' }}>
+                  No low stock alerts — inventory is healthy! ✅
+                </td></tr>
+              ) : (
+                data.lowStockProducts.map((product: any) => (
+                  <tr key={product.id}>
+                    <td style={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.85rem' }}>{product.sku}</td>
+                    <td>{product.name}</td>
+                    <td style={{ color: 'var(--text-secondary)' }}>{product.location || 'N/A'}</td>
+                    <td>
+                      <span className="badge badge-danger" style={{ fontWeight: 800 }}>
+                        {product.currentStock}
+                      </span>
+                    </td>
+                    <td style={{ color: 'var(--text-secondary)' }}>{product.minStockAlert}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

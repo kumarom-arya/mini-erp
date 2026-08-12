@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
-import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Employees = () => {
@@ -37,7 +37,6 @@ const Employees = () => {
     e.preventDefault();
     try {
       if (editingId) {
-        // If editing and password is empty, don't send it so it doesn't get updated to blank
         const updateData = { ...formData };
         if (!updateData.password) {
           delete (updateData as any).password;
@@ -57,7 +56,7 @@ const Employees = () => {
   const handleEdit = (employee: any) => {
     setFormData({
       username: employee.username || '',
-      password: '', // Don't pre-fill password for security. Leave blank to keep unchanged.
+      password: '',
       role: employee.role || 'SALES',
     });
     setEditingId(employee.id);
@@ -85,7 +84,7 @@ const Employees = () => {
   if (user?.role !== 'ADMIN') {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-        <h2 style={{ color: 'var(--color-danger)' }}>Access Denied: Admins Only</h2>
+        <h2 style={{ color: 'var(--danger)' }}>Access Denied: Admins Only</h2>
       </div>
     );
   }
@@ -95,7 +94,7 @@ const Employees = () => {
       <div className="flex justify-between align-center mb-4">
         <h1>Employee Management</h1>
         <button className="btn btn-primary" onClick={() => { setEditingId(null); setFormData(defaultFormData); setShowModal(true); }}>
-          <Plus size={18} /> Add Employee
+          <Plus size={16} /> Add Employee
         </button>
       </div>
 
@@ -111,38 +110,38 @@ const Employees = () => {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={4} style={{ textAlign: 'center' }}>Loading...</td></tr>
+              <tr><td colSpan={4} className="text-center" style={{ padding: '2rem', color: 'var(--text-muted)' }}>Loading...</td></tr>
             ) : employees.length === 0 ? (
-              <tr><td colSpan={4} style={{ textAlign: 'center' }}>No employees found</td></tr>
+              <tr><td colSpan={4} className="text-center" style={{ padding: '2rem', color: 'var(--text-muted)' }}>No employees found</td></tr>
             ) : (
               employees.map(employee => (
                 <tr key={employee.id}>
                   <td>
-                    <div style={{ fontWeight: 500 }}>{employee.username}</div>
+                    <div style={{ fontWeight: 600 }}>{employee.username}</div>
                   </td>
                   <td>
                     <span className={`badge ${employee.role === 'ADMIN' ? 'badge-primary' : employee.role === 'SALES' ? 'badge-success' : employee.role === 'WAREHOUSE' ? 'badge-warning' : 'badge-neutral'}`}>
                       {employee.role}
                     </span>
                   </td>
-                  <td>{new Date(employee.createdAt).toLocaleDateString()}</td>
+                  <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{new Date(employee.createdAt).toLocaleDateString()}</td>
                   <td>
                     <div className="flex gap-2">
-                      <button 
-                        className="btn btn-secondary" 
-                        style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem' }}
+                      <button
+                        className="btn btn-secondary"
+                        style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}
                         onClick={() => handleEdit(employee)}
                       >
-                        <Edit2 size={14} style={{ marginRight: '0.25rem' }} /> Edit
+                        <Edit2 size={12} /> Edit
                       </button>
-                      <button 
-                        className="btn btn-secondary" 
-                        style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem', color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}
+                      <button
+                        className="btn btn-danger"
+                        style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}
                         onClick={() => handleDelete(employee.id)}
-                        disabled={employee.id === user.id} // Prevent deleting yourself
+                        disabled={employee.id === user.id}
                         title={employee.id === user.id ? "You cannot delete yourself" : "Delete Employee"}
                       >
-                        <Trash2 size={14} style={{ marginRight: '0.25rem' }} /> Delete
+                        <Trash2 size={12} /> Delete
                       </button>
                     </div>
                   </td>
@@ -155,46 +154,54 @@ const Employees = () => {
 
       {showModal && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '500px', maxHeight: '85vh', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-            <h2 style={{ marginBottom: '1rem', flexShrink: 0 }}>{editingId ? 'Edit Employee' : 'Add Employee'}</h2>
-            <form onSubmit={handleSubmit} style={{ overflowY: 'auto', paddingRight: '0.5rem', flex: 1, minHeight: 0 }}>
-              <div className="form-group">
-                <label className="form-label">Username (Login ID) <span style={{ color: 'red' }}>*</span></label>
-                <input 
-                  className="form-input" 
-                  required 
-                  value={formData.username} 
-                  onChange={e => setFormData({...formData, username: e.target.value})} 
-                  placeholder="e.g. jdoe_sales"
-                />
-              </div>
-              
-              <div className="form-group mt-2">
-                <label className="form-label">Password {editingId && <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>(Leave blank to keep unchanged)</span>}</label>
-                <input 
-                  type="password"
-                  className="form-input" 
-                  required={!editingId} // Only required when creating a new user
-                  value={formData.password} 
-                  onChange={e => setFormData({...formData, password: e.target.value})} 
-                  placeholder={editingId ? 'Enter new password...' : 'Enter strong password...'}
-                />
+          <div className="modal-content" style={{ maxWidth: '500px' }}>
+            <div className="modal-header">
+              <h2>{editingId ? 'Edit Employee' : 'Add Employee'}</h2>
+              <button className="modal-close" onClick={closeModal}><X size={20} /></button>
+            </div>
+
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label className="form-label">Username (Login ID) <span style={{ color: 'var(--danger)' }}>*</span></label>
+                  <input
+                    className="form-input"
+                    required
+                    value={formData.username}
+                    onChange={e => setFormData({...formData, username: e.target.value})}
+                    placeholder="e.g. jdoe_sales"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    Password {editingId && <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 400, textTransform: 'none' }}>(Leave blank to keep unchanged)</span>}
+                  </label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    required={!editingId}
+                    value={formData.password}
+                    onChange={e => setFormData({...formData, password: e.target.value})}
+                    placeholder={editingId ? 'Enter new password...' : 'Enter strong password...'}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">System Role <span style={{ color: 'var(--danger)' }}>*</span></label>
+                  <select className="form-input" value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})}>
+                    <option value="SALES">Sales</option>
+                    <option value="ACCOUNTS">Accounts</option>
+                    <option value="WAREHOUSE">Warehouse</option>
+                    <option value="ADMIN">Admin</option>
+                  </select>
+                  <p style={{ marginTop: '0.4rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                    This role determines what sections of the Mini ERP they can access.
+                  </p>
+                </div>
               </div>
 
-              <div className="form-group mt-2">
-                <label className="form-label">System Role <span style={{ color: 'red' }}>*</span></label>
-                <select className="form-input" value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})}>
-                  <option value="SALES">Sales</option>
-                  <option value="ACCOUNTS">Accounts</option>
-                  <option value="WAREHOUSE">Warehouse</option>
-                  <option value="ADMIN">Admin</option>
-                </select>
-                <p style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                  This role determines what sections of the Mini ERP they can access.
-                </p>
-              </div>
-              
-              <div className="flex justify-between mt-6 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
+              <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={closeModal}>Cancel</button>
                 <button type="submit" className="btn btn-primary">{editingId ? 'Save Changes' : 'Create Employee'}</button>
               </div>

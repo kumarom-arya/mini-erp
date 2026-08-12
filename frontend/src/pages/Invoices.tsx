@@ -66,25 +66,25 @@ const Invoices = () => {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={7} style={{ textAlign: 'center' }}>Loading...</td></tr>
+              <tr><td colSpan={7} className="text-center" style={{ padding: '2rem', color: 'var(--text-muted)' }}>Loading...</td></tr>
             ) : invoices.length === 0 ? (
-              <tr><td colSpan={7} style={{ textAlign: 'center' }}>No invoices found</td></tr>
+              <tr><td colSpan={7} className="text-center" style={{ padding: '2rem', color: 'var(--text-muted)' }}>No invoices found</td></tr>
             ) : (
               invoices.map(invoice => (
                 <tr key={invoice.id}>
                   <td style={{ fontWeight: 600 }}>{invoice.invoiceNo}</td>
                   <td>{invoice.customer?.name}</td>
-                  <td>{invoice.challan?.challanNo || 'N/A'}</td>
-                  <td>{new Date(invoice.createdAt).toLocaleDateString()}</td>
-                  <td>₹{invoice.grandTotal.toFixed(2)}</td>
+                  <td style={{ color: 'var(--text-secondary)', fontFamily: 'monospace', fontSize: '0.8rem' }}>{invoice.challan?.challanNo || 'N/A'}</td>
+                  <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{new Date(invoice.createdAt).toLocaleDateString()}</td>
+                  <td style={{ fontWeight: 700 }}>₹{invoice.grandTotal.toFixed(2)}</td>
                   <td>
                     <span className={`badge ${invoice.status === 'PAID' ? 'badge-success' : invoice.status === 'UNPAID' ? 'badge-danger' : 'badge-warning'}`}>
                       {invoice.status}
                     </span>
                   </td>
                   <td>
-                    <button className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }} onClick={() => handleViewInvoice(invoice.id)} title="View Invoice">
-                      <ExternalLink size={14} /> View
+                    <button className="btn btn-secondary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }} onClick={() => handleViewInvoice(invoice.id)} title="View Invoice">
+                      <ExternalLink size={12} /> View
                     </button>
                   </td>
                 </tr>
@@ -96,19 +96,16 @@ const Invoices = () => {
 
       {selectedInvoice && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '900px', maxHeight: '90vh', overflow: 'hidden' }}>
-            <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'space-between', padding: '1.25rem', borderBottom: '1px solid var(--color-border)', backgroundColor: 'rgba(0,0,0,0.2)' }}>
-              <h2 style={{ margin: 0, color: 'var(--color-text-main)' }}>Invoice {selectedInvoice.invoiceNo}</h2>
-              <div style={{ display: 'flex', gap: '1rem' }}>
+          <div className="modal-content" style={{ maxWidth: '900px' }}>
+            <div className="modal-header">
+              <h2>Invoice {selectedInvoice.invoiceNo}</h2>
+              <div className="flex gap-3">
                 <button className="btn btn-primary" onClick={handlePrint}>
-                  <Printer size={18} /> Print PDF
+                  <Printer size={16} /> Print PDF
                 </button>
-                <button className="btn btn-secondary" onClick={() => setSelectedInvoice(null)}>
-                  <X size={18} /> Close
-                </button>
+                <button className="modal-close" onClick={() => setSelectedInvoice(null)}><X size={20} /></button>
               </div>
             </div>
-            
             <div style={{ flex: 1, overflowY: 'auto', backgroundColor: '#e5e7eb', padding: '2rem', minHeight: 0 }}>
               <div style={{ maxWidth: '800px', margin: '0 auto', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
                 <PrintableInvoice ref={printRef} invoice={selectedInvoice} settings={settings} />

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
-import { Search, Plus, Edit2 } from 'lucide-react';
+import { Search, Plus, Edit2, X } from 'lucide-react';
 
 const Customers = () => {
   const [customers, setCustomers] = useState<any[]>([]);
@@ -72,24 +72,25 @@ const Customers = () => {
       <div className="flex justify-between align-center mb-4">
         <h1>Customers</h1>
         <button className="btn btn-primary" onClick={() => { setEditingId(null); setFormData(defaultFormData); setShowModal(true); }}>
-          <Plus size={18} /> Add Customer
+          <Plus size={16} /> Add Customer
         </button>
       </div>
 
-      <div className="card mb-4" style={{ padding: '1rem', display: 'flex', gap: '1rem' }}>
-        <div style={{ flex: 1, position: 'relative' }}>
-          <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} />
-          <input 
-            type="text" 
-            className="form-input" 
-            style={{ paddingLeft: '2.5rem' }} 
-            placeholder="Search customers..." 
+      {/* Search */}
+      <div style={{ marginBottom: '1rem' }}>
+        <div className="search-container">
+          <Search size={16} className="search-icon" />
+          <input
+            type="text"
+            className="form-input search-input"
+            placeholder="Search customers..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
       </div>
 
+      {/* Table */}
       <div className="table-container">
         <table>
           <thead>
@@ -105,37 +106,35 @@ const Customers = () => {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={7} style={{ textAlign: 'center' }}>Loading...</td></tr>
+              <tr><td colSpan={7} className="text-center" style={{ padding: '2rem', color: 'var(--text-muted)' }}>Loading...</td></tr>
             ) : customers.length === 0 ? (
-              <tr><td colSpan={7} style={{ textAlign: 'center' }}>No customers found</td></tr>
+              <tr><td colSpan={7} className="text-center" style={{ padding: '2rem', color: 'var(--text-muted)' }}>No customers found</td></tr>
             ) : (
               customers.map(customer => (
                 <tr key={customer.id}>
                   <td>
-                    <div style={{ fontWeight: 500 }}>{customer.name}</div>
-                    {customer.businessName && <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{customer.businessName}</div>}
+                    <div style={{ fontWeight: 600 }}>{customer.name}</div>
+                    {customer.businessName && <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>{customer.businessName}</div>}
                   </td>
                   <td>
-                    <div>{customer.mobile}</div>
-                    {customer.email && <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{customer.email}</div>}
+                    <div style={{ fontSize: '0.875rem' }}>{customer.mobile}</div>
+                    {customer.email && <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>{customer.email}</div>}
                   </td>
-                  <td style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{customer.gstNumber || '-'}</td>
-                  <td>
-                    <span className="badge badge-neutral">{customer.type}</span>
-                  </td>
+                  <td style={{ fontFamily: 'monospace', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{customer.gstNumber || '—'}</td>
+                  <td><span className="badge badge-neutral">{customer.type}</span></td>
                   <td>
                     <span className={`badge ${customer.status === 'ACTIVE' ? 'badge-success' : customer.status === 'LEAD' ? 'badge-warning' : 'badge-danger'}`}>
                       {customer.status}
                     </span>
                   </td>
-                  <td>{new Date(customer.createdAt).toLocaleDateString()}</td>
+                  <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{new Date(customer.createdAt).toLocaleDateString()}</td>
                   <td>
-                    <button 
-                      className="btn btn-secondary" 
-                      style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem' }}
+                    <button
+                      className="btn btn-secondary"
+                      style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}
                       onClick={() => handleEdit(customer)}
                     >
-                      <Edit2 size={14} style={{ marginRight: '0.25rem' }} /> Edit
+                      <Edit2 size={12} /> Edit
                     </button>
                   </td>
                 </tr>
@@ -145,19 +144,20 @@ const Customers = () => {
         </table>
       </div>
 
+      {/* Modal */}
       {showModal && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '600px', maxHeight: '85vh', padding: '1.5rem', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            <div style={{ flexShrink: 0, marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ margin: 0 }}>{editingId ? 'Edit Customer' : 'Add Customer'}</h2>
-              <button onClick={closeModal} style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontSize: '1.5rem', cursor: 'pointer', lineHeight: 1 }}>&times;</button>
+          <div className="modal-content" style={{ maxWidth: '600px' }}>
+            <div className="modal-header">
+              <h2>{editingId ? 'Edit Customer' : 'Add Customer'}</h2>
+              <button className="modal-close" onClick={closeModal}><X size={20} /></button>
             </div>
-            
+
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-              <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, paddingRight: '0.5rem' }}>
+              <div className="modal-body">
                 <div className="flex gap-4">
                   <div className="form-group" style={{ flex: 1 }}>
-                    <label className="form-label">Contact Name <span style={{ color: 'red' }}>*</span></label>
+                    <label className="form-label">Contact Name <span style={{ color: 'var(--danger)' }}>*</span></label>
                     <input className="form-input" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
                   </div>
                   <div className="form-group" style={{ flex: 1 }}>
@@ -166,9 +166,9 @@ const Customers = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-4 mt-2">
+                <div className="flex gap-4">
                   <div className="form-group" style={{ flex: 1 }}>
-                    <label className="form-label">Mobile No. <span style={{ color: 'red' }}>*</span></label>
+                    <label className="form-label">Mobile No. <span style={{ color: 'var(--danger)' }}>*</span></label>
                     <input className="form-input" required value={formData.mobile} onChange={e => setFormData({...formData, mobile: e.target.value})} />
                   </div>
                   <div className="form-group" style={{ flex: 1 }}>
@@ -176,18 +176,18 @@ const Customers = () => {
                     <input className="form-input" type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
                   </div>
                 </div>
-                
-                <div className="form-group mt-2">
+
+                <div className="form-group">
                   <label className="form-label">GSTIN / Tax Number</label>
                   <input className="form-input" value={formData.gstNumber} onChange={e => setFormData({...formData, gstNumber: e.target.value})} placeholder="e.g. 29ABCDE1234F1Z5" />
                 </div>
 
-                <div className="form-group mt-2">
+                <div className="form-group">
                   <label className="form-label">Billing/Shipping Address</label>
                   <textarea className="form-input" rows={3} value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} placeholder="Full address..." />
                 </div>
 
-                <div className="flex gap-4 mt-2">
+                <div className="flex gap-4">
                   <div className="form-group" style={{ flex: 1 }}>
                     <label className="form-label">Customer Type</label>
                     <select className="form-input" value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})}>
@@ -207,7 +207,7 @@ const Customers = () => {
                 </div>
               </div>
 
-              <div style={{ flexShrink: 0, marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between' }}>
+              <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={closeModal}>Cancel</button>
                 <button type="submit" className="btn btn-primary">{editingId ? 'Save Changes' : 'Save Customer'}</button>
               </div>

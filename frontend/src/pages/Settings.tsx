@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
-import { Settings as SettingsIcon, Save } from 'lucide-react';
+import { Settings as SettingsIcon, Save, Loader2, AlertTriangle } from 'lucide-react';
 
 const Settings = () => {
   const [formData, setFormData] = useState({
@@ -60,18 +60,33 @@ const Settings = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return (
+    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+      <div className="skeleton skeleton-text" style={{ width: '250px', height: '2rem', marginBottom: '2rem' }} />
+      <div className="skeleton" style={{ height: '400px', borderRadius: 'var(--radius-xl)' }} />
+    </div>
+  );
 
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-      <div className="flex align-center gap-2 mb-6">
-        <SettingsIcon size={28} style={{ color: 'var(--color-primary)' }} />
+      <div className="flex align-center gap-3 mb-6">
+        <div style={{
+          padding: '0.6rem',
+          background: 'var(--primary-light)',
+          borderRadius: 'var(--radius-md)',
+          color: 'var(--primary)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <SettingsIcon size={22} />
+        </div>
         <h1>Company Settings</h1>
       </div>
 
-      <div className="card">
+      <div className="card" style={{ padding: '1.75rem' }}>
         {message && (
-          <div style={{ padding: '1rem', marginBottom: '1rem', borderRadius: '4px', backgroundColor: message.includes('success') ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: message.includes('success') ? 'var(--color-success)' : 'var(--color-danger)' }}>
+          <div className={`alert ${message.includes('success') ? 'alert-success' : 'alert-danger'}`}>
             {message}
           </div>
         )}
@@ -110,19 +125,32 @@ const Settings = () => {
           </div>
 
           <button type="submit" className="btn btn-primary" disabled={saving}>
-            <Save size={18} /> {saving ? 'Saving...' : 'Save Settings'}
+            {saving ? (
+              <>
+                <Loader2 size={16} style={{ animation: 'spinSlow 1s linear infinite' }} />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save size={16} /> Save Settings
+              </>
+            )}
           </button>
         </form>
       </div>
 
-      <div className="card mt-6" style={{ border: '1px solid var(--color-danger)', padding: '1.5rem' }}>
-        <h3 style={{ color: 'var(--color-danger)', marginTop: 0, marginBottom: '0.5rem' }}>Danger Zone: Reset All Data</h3>
-        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
+      {/* Danger Zone */}
+      <div className="danger-zone">
+        <div className="flex align-center gap-2" style={{ marginBottom: '0.5rem' }}>
+          <AlertTriangle size={18} />
+          <h3 style={{ margin: 0 }}>Danger Zone: Reset All Data</h3>
+        </div>
+        <p>
           This will permanently delete all Customers, Products, Challans, Invoices, Payments, and Company Settings so you can start completely fresh.
         </p>
-        <button 
-          className="btn btn-secondary" 
-          style={{ borderColor: 'var(--color-danger)', color: 'var(--color-danger)' }}
+        <button
+          className="btn btn-danger"
+          style={{ fontSize: '0.8rem' }}
           onClick={async () => {
             if (window.confirm('ARE YOU SURE? This will PERMANENTLY DELETE all company data, customers, invoices, and products!')) {
               try {

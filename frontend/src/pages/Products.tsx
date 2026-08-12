@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
-import { Search, Plus, Edit } from 'lucide-react';
+import { Search, Plus, Edit, X } from 'lucide-react';
 
 const Products = () => {
   const [products, setProducts] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
-  
-  // Modals
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-
   const [formData, setFormData] = useState({ name: '', sku: '', category: '', unitPrice: '', currentStock: '', minStockAlert: '' });
 
   const fetchProducts = async () => {
@@ -69,18 +66,17 @@ const Products = () => {
       <div className="flex justify-between align-center mb-4">
         <h1>Products & Inventory</h1>
         <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-          <Plus size={18} /> Add Product
+          <Plus size={16} /> Add Product
         </button>
       </div>
 
-      <div className="card mb-4" style={{ padding: '1rem', display: 'flex', gap: '1rem' }}>
-        <div style={{ flex: 1, position: 'relative' }}>
-          <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} />
-          <input 
-            type="text" 
-            className="form-input" 
-            style={{ paddingLeft: '2.5rem' }} 
-            placeholder="Search products by SKU or Name..." 
+      <div style={{ marginBottom: '1rem' }}>
+        <div className="search-container">
+          <Search size={16} className="search-icon" />
+          <input
+            type="text"
+            className="form-input search-input"
+            placeholder="Search products by SKU or Name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -102,17 +98,17 @@ const Products = () => {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={7} style={{ textAlign: 'center' }}>Loading...</td></tr>
+              <tr><td colSpan={7} className="text-center" style={{ padding: '2rem', color: 'var(--text-muted)' }}>Loading...</td></tr>
             ) : products.length === 0 ? (
-              <tr><td colSpan={7} style={{ textAlign: 'center' }}>No products found</td></tr>
+              <tr><td colSpan={7} className="text-center" style={{ padding: '2rem', color: 'var(--text-muted)' }}>No products found</td></tr>
             ) : (
               products.map(product => (
                 <tr key={product.id}>
-                  <td style={{ fontFamily: 'monospace' }}>{product.sku}</td>
+                  <td style={{ fontFamily: 'monospace', fontSize: '0.8rem', fontWeight: 600 }}>{product.sku}</td>
                   <td style={{ fontWeight: 500 }}>{product.name}</td>
-                  <td>{product.category}</td>
-                  <td>₹{product.unitPrice.toFixed(2)}</td>
-                  <td>{product.currentStock}</td>
+                  <td style={{ color: 'var(--text-secondary)' }}>{product.category}</td>
+                  <td style={{ fontWeight: 600 }}>₹{product.unitPrice.toFixed(2)}</td>
+                  <td style={{ fontWeight: 600 }}>{product.currentStock}</td>
                   <td>
                     {product.currentStock <= product.minStockAlert ? (
                       <span className="badge badge-danger">Low Stock</span>
@@ -121,8 +117,8 @@ const Products = () => {
                     )}
                   </td>
                   <td>
-                    <button className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }} onClick={() => openEdit(product)}>
-                      <Edit size={14} /> Edit
+                    <button className="btn btn-secondary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }} onClick={() => openEdit(product)}>
+                      <Edit size={12} /> Edit
                     </button>
                   </td>
                 </tr>
@@ -134,14 +130,14 @@ const Products = () => {
 
       {showModal && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '500px', maxHeight: '85vh', padding: '1.5rem', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            <div style={{ flexShrink: 0, marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ margin: 0 }}>{editingId ? 'Edit Product' : 'Add Product'}</h2>
-              <button onClick={closeModal} style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontSize: '1.5rem', cursor: 'pointer', lineHeight: 1 }}>&times;</button>
+          <div className="modal-content" style={{ maxWidth: '500px' }}>
+            <div className="modal-header">
+              <h2>{editingId ? 'Edit Product' : 'Add Product'}</h2>
+              <button className="modal-close" onClick={closeModal}><X size={20} /></button>
             </div>
 
             <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-              <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, paddingRight: '0.5rem' }}>
+              <div className="modal-body">
                 <div className="form-group">
                   <label className="form-label">Product Name</label>
                   <input className="form-input" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
@@ -158,7 +154,7 @@ const Products = () => {
                 </div>
                 <div className="flex gap-4">
                   <div className="form-group" style={{ flex: 1 }}>
-                    <label className="form-label">Unit Price</label>
+                    <label className="form-label">Unit Price (₹)</label>
                     <input className="form-input" type="number" step="0.01" required value={formData.unitPrice} onChange={e => setFormData({...formData, unitPrice: e.target.value})} />
                   </div>
                   <div className="form-group" style={{ flex: 1 }}>
@@ -172,7 +168,7 @@ const Products = () => {
                 </div>
               </div>
 
-              <div style={{ flexShrink: 0, marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between' }}>
+              <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={closeModal}>Cancel</button>
                 <button type="submit" className="btn btn-primary">{editingId ? 'Update Product' : 'Save Product'}</button>
               </div>

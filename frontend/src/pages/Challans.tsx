@@ -134,7 +134,6 @@ const Challans = () => {
   };
 
   const handleEditRequestClick = async (id: number) => {
-    // Fetch challan details to prefill items
     try {
       const res = await api.get(`/challans/${id}`);
       const challan = res.data;
@@ -208,18 +207,22 @@ const Challans = () => {
     }
   };
 
+  const pendingCount = editRequests.filter(r => r.status === 'PENDING').length;
+
   return (
     <div>
       <div className="flex justify-between align-center mb-4">
         <h1>Sales Challans</h1>
-        <div className="flex gap-4">
+        <div className="flex gap-3">
           {user?.role === 'ADMIN' && (
             <button className="btn btn-secondary" onClick={() => setShowRequestsModal(true)}>
-              Review Edit Requests {editRequests.filter(r => r.status === 'PENDING').length > 0 && `(${editRequests.filter(r => r.status === 'PENDING').length})`}
+              Review Edit Requests {pendingCount > 0 && (
+                <span className="badge badge-warning" style={{ marginLeft: '0.25rem', fontSize: '0.65rem' }}>{pendingCount}</span>
+              )}
             </button>
           )}
           <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-            <Plus size={18} /> Create Challan
+            <Plus size={16} /> Create Challan
           </button>
         </div>
       </div>
@@ -238,9 +241,9 @@ const Challans = () => {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={6} style={{ textAlign: 'center' }}>Loading...</td></tr>
+              <tr><td colSpan={6} className="text-center" style={{ padding: '2rem', color: 'var(--text-muted)' }}>Loading...</td></tr>
             ) : challans.length === 0 ? (
-              <tr><td colSpan={6} style={{ textAlign: 'center' }}>No challans found</td></tr>
+              <tr><td colSpan={6} className="text-center" style={{ padding: '2rem', color: 'var(--text-muted)' }}>No challans found</td></tr>
             ) : (
               challans.map(challan => (
                 <tr key={challan.id}>
@@ -252,29 +255,29 @@ const Challans = () => {
                       {challan.status}
                     </span>
                   </td>
-                  <td>{challan.createdBy?.username}</td>
+                  <td style={{ color: 'var(--text-secondary)' }}>{challan.createdBy?.username}</td>
                   <td>
-                    <div className="flex gap-2 align-center">
-                      <button className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }} onClick={() => handleViewChallan(challan.id)} title="View/Print">
-                        <Printer size={14} /> Print
+                    <div className="flex gap-2 align-center" style={{ flexWrap: 'wrap' }}>
+                      <button className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem' }} onClick={() => handleViewChallan(challan.id)} title="View/Print">
+                        <Printer size={12} /> Print
                       </button>
                       {challan.status === 'DRAFT' && (
                         <>
-                          <button className="btn btn-primary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }} onClick={() => handleUpdateStatus(challan.id, 'CONFIRMED')} title="Confirm (Reduces Stock)">
-                            <Check size={14} /> Confirm
+                          <button className="btn btn-primary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem' }} onClick={() => handleUpdateStatus(challan.id, 'CONFIRMED')} title="Confirm">
+                            <Check size={12} /> Confirm
                           </button>
-                          <button className="btn btn-danger" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }} onClick={() => handleUpdateStatus(challan.id, 'CANCELLED')}>
-                            <X size={14} /> Cancel
+                          <button className="btn btn-danger" style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem' }} onClick={() => handleUpdateStatus(challan.id, 'CANCELLED')}>
+                            <X size={12} /> Cancel
                           </button>
                         </>
                       )}
                       {challan.status === 'CONFIRMED' && !challan.invoice && (
-                        <button className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', backgroundColor: 'var(--color-primary)', color: 'white', border: 'none' }} onClick={() => handleGenerateInvoice(challan)}>
-                          Generate Invoice
+                        <button className="btn btn-primary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem' }} onClick={() => handleGenerateInvoice(challan)}>
+                          Invoice
                         </button>
                       )}
                       {challan.status === 'CONFIRMED' && (user?.role === 'SALES' || user?.role === 'ADMIN') && (
-                        <button className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }} onClick={() => handleEditRequestClick(challan.id)}>
+                        <button className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem' }} onClick={() => handleEditRequestClick(challan.id)}>
                           Request Edit
                         </button>
                       )}
@@ -287,21 +290,19 @@ const Challans = () => {
         </table>
       </div>
 
+      {/* View/Print Challan Modal */}
       {viewChallan && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '900px', maxHeight: '90vh', overflow: 'hidden' }}>
-            <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'space-between', padding: '1.25rem', borderBottom: '1px solid var(--color-border)', backgroundColor: 'rgba(0,0,0,0.2)' }}>
-              <h2 style={{ margin: 0, color: 'var(--color-text-main)' }}>Challan {viewChallan.challanNo}</h2>
-              <div style={{ display: 'flex', gap: '1rem' }}>
+          <div className="modal-content" style={{ maxWidth: '900px' }}>
+            <div className="modal-header">
+              <h2>Challan {viewChallan.challanNo}</h2>
+              <div className="flex gap-3">
                 <button className="btn btn-primary" onClick={handlePrint}>
-                  <Printer size={18} /> Print PDF
+                  <Printer size={16} /> Print PDF
                 </button>
-                <button className="btn btn-secondary" onClick={() => setViewChallan(null)}>
-                  <X size={18} /> Close
-                </button>
+                <button className="modal-close" onClick={() => setViewChallan(null)}><X size={20} /></button>
               </div>
             </div>
-            
             <div style={{ flex: 1, overflowY: 'auto', backgroundColor: '#e5e7eb', padding: '2rem', minHeight: 0 }}>
               <div style={{ maxWidth: '800px', margin: '0 auto', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
                 <PrintableChallan ref={printRef} challan={viewChallan} settings={settings} />
@@ -311,12 +312,16 @@ const Challans = () => {
         </div>
       )}
 
+      {/* Create/Edit Challan Modal */}
       {showModal && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '800px', maxHeight: '90vh', padding: '1.5rem' }}>
-            <h2>{editModeId ? 'Propose Edits to Challan' : 'New Sales Challan'}</h2>
-            
-            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '1rem' }}>
+          <div className="modal-content" style={{ maxWidth: '800px' }}>
+            <div className="modal-header">
+              <h2>{editModeId ? 'Propose Edits to Challan' : 'New Sales Challan'}</h2>
+              <button className="modal-close" onClick={closeCreateModal}><X size={20} /></button>
+            </div>
+
+            <div className="modal-body">
               <div className="form-group">
                 <label className="form-label">Customer</label>
                 <select className="form-input" value={selectedCustomer} onChange={(e) => setSelectedCustomer(e.target.value)} disabled={!!editModeId}>
@@ -327,9 +332,9 @@ const Challans = () => {
                 </select>
               </div>
 
-              <div className="card" style={{ padding: '1rem', marginTop: '1.5rem', border: '1px solid var(--color-border)', boxShadow: 'none' }}>
-                <h3 style={{ fontSize: '1rem' }}>Add Products</h3>
-                <div className="flex gap-4 align-center mt-4">
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1rem', marginTop: '1rem' }}>
+                <h3 style={{ fontSize: '0.9rem', marginBottom: '0.75rem' }}>Add Products</h3>
+                <div className="flex gap-3 align-center">
                   <div style={{ flex: 2 }}>
                     <select className="form-input" value={selectedProduct} onChange={(e) => setSelectedProduct(e.target.value)}>
                       <option value="">Select product...</option>
@@ -346,11 +351,11 @@ const Challans = () => {
                   <div style={{ flex: 1 }}>
                     <input type="number" min="1" className="form-input" value={selectedQty} onChange={(e) => setSelectedQty(e.target.value)} placeholder="Qty" />
                   </div>
-                  <button type="button" className="btn btn-secondary" onClick={handleAddItem}>Add Item</button>
+                  <button type="button" className="btn btn-secondary" onClick={handleAddItem}>Add</button>
                 </div>
 
                 {items.length > 0 && (
-                  <div className="table-container mt-4" style={{ background: 'rgba(0,0,0,0.2)' }}>
+                  <div className="table-container mt-4" style={{ background: 'rgba(0,0,0,0.15)', boxShadow: 'none' }}>
                     <table>
                       <thead>
                         <tr>
@@ -358,21 +363,22 @@ const Challans = () => {
                           <th>Product</th>
                           <th>Qty</th>
                           <th>Price</th>
+                          <th></th>
                         </tr>
                       </thead>
                       <tbody>
                         {items.map((item, idx) => (
                           <tr key={idx}>
-                            <td>{item.sku}</td>
+                            <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{item.sku}</td>
                             <td>{item.productName}</td>
                             <td>{item.quantity}</td>
                             <td>₹{item.unitPrice.toFixed(2)}</td>
                             <td>
-                              <button className="btn btn-danger" style={{ padding: '2px 5px', fontSize: '10px' }} onClick={() => {
+                              <button className="btn btn-danger" style={{ padding: '2px 6px', fontSize: '0.65rem' }} onClick={() => {
                                 const newItems = [...items];
                                 newItems.splice(idx, 1);
                                 setItems(newItems);
-                              }}><X size={12} /></button>
+                              }}><X size={10} /></button>
                             </td>
                           </tr>
                         ))}
@@ -383,11 +389,11 @@ const Challans = () => {
               </div>
             </div>
 
-            <div className="flex justify-between mt-4 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
+            <div className="modal-footer">
               <button type="button" className="btn btn-secondary" onClick={closeCreateModal}>Cancel</button>
-              <div className="flex gap-4">
+              <div className="flex gap-3">
                 {editModeId ? (
-                   <button type="button" className="btn btn-primary" onClick={() => handleCreateChallan('DRAFT')}>Submit Edit Request</button>
+                  <button type="button" className="btn btn-primary" onClick={() => handleCreateChallan('DRAFT')}>Submit Edit Request</button>
                 ) : (
                   <>
                     <button type="button" className="btn btn-secondary" onClick={() => handleCreateChallan('DRAFT')}>Save as Draft</button>
@@ -400,45 +406,52 @@ const Challans = () => {
         </div>
       )}
 
+      {/* Edit Requests Review Modal */}
       {showRequestsModal && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '900px', maxHeight: '90vh', padding: '1.5rem' }}>
-            <h2>Review Edit Requests</h2>
-            <div style={{ flex: 1, overflowY: 'auto' }}>
+          <div className="modal-content" style={{ maxWidth: '900px' }}>
+            <div className="modal-header">
+              <h2>Review Edit Requests</h2>
+              <button className="modal-close" onClick={() => setShowRequestsModal(false)}><X size={20} /></button>
+            </div>
+
+            <div className="modal-body">
               {editRequests.length === 0 ? (
-                <p>No edit requests found.</p>
+                <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>No edit requests found.</p>
               ) : (
                 editRequests.map(req => (
-                  <div key={req.id} className="card" style={{ marginBottom: '1rem', border: '1px solid var(--color-border)' }}>
+                  <div key={req.id} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.25rem', marginBottom: '1rem' }}>
                     <div className="flex justify-between align-center mb-2">
-                      <h4 style={{ margin: 0 }}>Request for {req.challan?.challanNo} (by {req.requestedBy?.username})</h4>
+                      <h3 style={{ margin: 0, fontSize: '0.95rem' }}>Request for {req.challan?.challanNo} <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>by {req.requestedBy?.username}</span></h3>
                       <span className={`badge ${req.status === 'PENDING' ? 'badge-warning' : req.status === 'APPROVED' ? 'badge-success' : 'badge-danger'}`}>
                         {req.status}
                       </span>
                     </div>
-                    <p style={{ margin: '5px 0', fontSize: '0.85rem' }}>Current Qty: {req.challan?.totalQty} | Customer: {req.challan?.customer?.name}</p>
+                    <p style={{ margin: '0.25rem 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>Current Qty: {req.challan?.totalQty} | Customer: {req.challan?.customer?.name}</p>
                     
-                    <div style={{ backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '4px', fontSize: '0.85rem', border: '1px solid var(--color-border)' }}>
+                    <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', fontSize: '0.8rem', marginTop: '0.5rem', border: '1px solid var(--border)' }}>
                       <strong>Proposed Items:</strong>
-                      <ul style={{ margin: '5px 0', paddingLeft: '20px' }}>
+                      <ul style={{ margin: '0.25rem 0 0', paddingLeft: '1.25rem' }}>
                         {JSON.parse(req.proposedData).map((item: any, idx: number) => (
-                          <li key={idx}>{item.productName} ({item.sku}) - Qty: {item.quantity}</li>
+                          <li key={idx} style={{ color: 'var(--text-secondary)' }}>{item.productName} ({item.sku}) — Qty: {item.quantity}</li>
                         ))}
                       </ul>
                     </div>
 
                     {req.status === 'PENDING' && (
-                      <div className="flex gap-4 mt-4">
-                        <button className="btn btn-primary" onClick={() => handleResolveEditRequest(req.id, 'APPROVE')}><Check size={14}/> Approve & Apply</button>
-                        <button className="btn btn-danger" onClick={() => handleResolveEditRequest(req.id, 'REJECT')}><X size={14}/> Reject</button>
+                      <div className="flex gap-3 mt-4">
+                        <button className="btn btn-primary" style={{ fontSize: '0.75rem', padding: '0.4rem 0.75rem' }} onClick={() => handleResolveEditRequest(req.id, 'APPROVE')}><Check size={12}/> Approve & Apply</button>
+                        <button className="btn btn-danger" style={{ fontSize: '0.75rem', padding: '0.4rem 0.75rem' }} onClick={() => handleResolveEditRequest(req.id, 'REJECT')}><X size={12}/> Reject</button>
                       </div>
                     )}
                   </div>
                 ))
               )}
             </div>
-            <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
+
+            <div className="modal-footer">
               <button className="btn btn-secondary" onClick={() => setShowRequestsModal(false)}>Close</button>
+              <div></div>
             </div>
           </div>
         </div>

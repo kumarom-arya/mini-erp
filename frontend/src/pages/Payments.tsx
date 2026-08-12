@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
-import { CreditCard, Plus } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 
 const Payments = () => {
   const [payments, setPayments] = useState<any[]>([]);
@@ -67,7 +67,7 @@ const Payments = () => {
       <div className="flex justify-between align-center mb-4">
         <h1>Payments Received</h1>
         <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-          <Plus size={18} /> Record Payment
+          <Plus size={16} /> Record Payment
         </button>
       </div>
 
@@ -86,21 +86,21 @@ const Payments = () => {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={7} style={{ textAlign: 'center' }}>Loading...</td></tr>
+              <tr><td colSpan={7} className="text-center" style={{ padding: '2rem', color: 'var(--text-muted)' }}>Loading...</td></tr>
             ) : payments.length === 0 ? (
-              <tr><td colSpan={7} style={{ textAlign: 'center' }}>No payments found</td></tr>
+              <tr><td colSpan={7} className="text-center" style={{ padding: '2rem', color: 'var(--text-muted)' }}>No payments found</td></tr>
             ) : (
               payments.map(payment => (
                 <tr key={payment.id}>
-                  <td>PAY-{payment.id.toString().padStart(4, '0')}</td>
-                  <td>{new Date(payment.paymentDate).toLocaleDateString()}</td>
+                  <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>PAY-{payment.id.toString().padStart(4, '0')}</td>
+                  <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{new Date(payment.paymentDate).toLocaleDateString()}</td>
                   <td>{payment.invoice?.customer?.name}</td>
-                  <td>{payment.invoice?.invoiceNo}</td>
-                  <td style={{ fontWeight: 600, color: 'var(--color-success)' }}>
+                  <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{payment.invoice?.invoiceNo}</td>
+                  <td style={{ fontWeight: 700, color: 'var(--success)' }}>
                     +₹{payment.amount.toFixed(2)}
                   </td>
-                  <td>{payment.paymentMode}</td>
-                  <td>{payment.referenceNo || '-'}</td>
+                  <td><span className="badge badge-neutral">{payment.paymentMode}</span></td>
+                  <td style={{ color: 'var(--text-secondary)' }}>{payment.referenceNo || '—'}</td>
                 </tr>
               ))
             )}
@@ -110,68 +110,74 @@ const Payments = () => {
 
       {showModal && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '500px', maxHeight: '85vh', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-            <h2 style={{ marginBottom: '1rem', flexShrink: 0 }}>Record Payment</h2>
-            <form onSubmit={handleCreatePayment} style={{ overflowY: 'auto', paddingRight: '0.5rem', flex: 1, minHeight: 0 }}>
-              <div className="form-group mt-4">
-                <label className="form-label">Invoice</label>
-                <select className="form-input" required value={invoiceId} onChange={(e) => {
-                  setInvoiceId(e.target.value);
-                  const inv = invoices.find(i => i.id === parseInt(e.target.value));
-                  if (inv) {
-                    const paid = inv.payments?.reduce((s: number, p: any) => s + p.amount, 0) || 0;
-                    const remaining = inv.grandTotal - paid;
-                    setMaxAmount(remaining);
-                    setAmount(remaining.toFixed(2));
-                  } else {
-                    setMaxAmount(0);
-                    setAmount('');
-                  }
-                }}>
-                  <option value="">Select Invoice...</option>
-                  {invoices.map(inv => {
-                    const paid = inv.payments?.reduce((s: number, p: any) => s + p.amount, 0) || 0;
-                    const remaining = inv.grandTotal - paid;
-                    return (
-                      <option key={inv.id} value={inv.id}>
-                        {inv.invoiceNo} - {inv.customer?.name} (Due: ₹{remaining.toFixed(2)})
-                      </option>
-                    );
-                  })}
-                </select>
+          <div className="modal-content" style={{ maxWidth: '500px' }}>
+            <div className="modal-header">
+              <h2>Record Payment</h2>
+              <button className="modal-close" onClick={() => setShowModal(false)}><X size={20} /></button>
+            </div>
+
+            <form onSubmit={handleCreatePayment} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label className="form-label">Invoice</label>
+                  <select className="form-input" required value={invoiceId} onChange={(e) => {
+                    setInvoiceId(e.target.value);
+                    const inv = invoices.find(i => i.id === parseInt(e.target.value));
+                    if (inv) {
+                      const paid = inv.payments?.reduce((s: number, p: any) => s + p.amount, 0) || 0;
+                      const remaining = inv.grandTotal - paid;
+                      setMaxAmount(remaining);
+                      setAmount(remaining.toFixed(2));
+                    } else {
+                      setMaxAmount(0);
+                      setAmount('');
+                    }
+                  }}>
+                    <option value="">Select Invoice...</option>
+                    {invoices.map(inv => {
+                      const paid = inv.payments?.reduce((s: number, p: any) => s + p.amount, 0) || 0;
+                      const remaining = inv.grandTotal - paid;
+                      return (
+                        <option key={inv.id} value={inv.id}>
+                          {inv.invoiceNo} - {inv.customer?.name} (Due: ₹{remaining.toFixed(2)})
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Amount (₹)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    max={maxAmount || undefined}
+                    className="form-input"
+                    required
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                  />
+                  {maxAmount > 0 && <small style={{ color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block', fontSize: '0.75rem' }}>Maximum allowed: ₹{maxAmount.toFixed(2)}</small>}
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Payment Mode</label>
+                  <select className="form-input" value={paymentMode} onChange={(e) => setPaymentMode(e.target.value)}>
+                    <option value="CASH">Cash</option>
+                    <option value="BANK_TRANSFER">Bank Transfer</option>
+                    <option value="UPI">UPI</option>
+                    <option value="CHEQUE">Cheque</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Reference No (Optional)</label>
+                  <input type="text" className="form-input" value={referenceNo} onChange={(e) => setReferenceNo(e.target.value)} placeholder="Transaction ID, Cheque No..." />
+                </div>
               </div>
 
-              <div className="form-group mt-4">
-                <label className="form-label">Amount</label>
-                <input 
-                  type="number" 
-                  step="0.01" 
-                  min="0.01"
-                  max={maxAmount || undefined}
-                  className="form-input" 
-                  required 
-                  value={amount} 
-                  onChange={(e) => setAmount(e.target.value)} 
-                />
-                {maxAmount > 0 && <small style={{ color: 'var(--color-text-muted)', marginTop: '0.25rem', display: 'block' }}>Maximum allowed: ₹{maxAmount.toFixed(2)}</small>}
-              </div>
-
-              <div className="form-group mt-4">
-                <label className="form-label">Payment Mode</label>
-                <select className="form-input" value={paymentMode} onChange={(e) => setPaymentMode(e.target.value)}>
-                  <option value="CASH">Cash</option>
-                  <option value="BANK_TRANSFER">Bank Transfer</option>
-                  <option value="UPI">UPI</option>
-                  <option value="CHEQUE">Cheque</option>
-                </select>
-              </div>
-
-              <div className="form-group mt-4">
-                <label className="form-label">Reference No (Optional)</label>
-                <input type="text" className="form-input" value={referenceNo} onChange={(e) => setReferenceNo(e.target.value)} placeholder="Transaction ID, Cheque No..." />
-              </div>
-
-              <div className="flex justify-between mt-6 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
+              <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
                 <button type="submit" className="btn btn-primary">Save Payment</button>
               </div>
