@@ -110,9 +110,9 @@ const Payments = () => {
 
       {showModal && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '500px', padding: '1.5rem' }}>
-            <h2>Record Payment</h2>
-            <form onSubmit={handleCreatePayment}>
+          <div className="modal-content" style={{ maxWidth: '500px', maxHeight: '85vh', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+            <h2 style={{ marginBottom: '1rem', flexShrink: 0 }}>Record Payment</h2>
+            <form onSubmit={handleCreatePayment} style={{ overflowY: 'auto', paddingRight: '0.5rem', flex: 1, minHeight: 0 }}>
               <div className="form-group mt-4">
                 <label className="form-label">Invoice</label>
                 <select className="form-input" required value={invoiceId} onChange={(e) => {

@@ -147,9 +147,9 @@ const Customers = () => {
 
       {showModal && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '600px', maxHeight: '90vh', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-            <h2 style={{ marginBottom: '1rem' }}>{editingId ? 'Edit Customer' : 'Add Customer'}</h2>
-            <form onSubmit={handleSubmit} style={{ overflowY: 'auto', paddingRight: '1rem', flex: 1 }}>
+          <div className="modal-content" style={{ maxWidth: '600px', maxHeight: '85vh', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+            <h2 style={{ marginBottom: '1rem', flexShrink: 0 }}>{editingId ? 'Edit Customer' : 'Add Customer'}</h2>
+            <form onSubmit={handleSubmit} style={{ overflowY: 'auto', paddingRight: '0.5rem', flex: 1, minHeight: 0 }}>
               <div className="flex gap-4">
                 <div className="form-group" style={{ flex: 1 }}>
                   <label className="form-label">Contact Name <span style={{ color: 'red' }}>*</span></label>

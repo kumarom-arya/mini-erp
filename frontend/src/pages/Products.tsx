@@ -134,9 +134,9 @@ const Products = () => {
 
       {showModal && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '500px', padding: '1.5rem' }}>
-            <h2>{editingId ? 'Edit Product' : 'Add Product'}</h2>
-            <form onSubmit={handleSave}>
+          <div className="modal-content" style={{ maxWidth: '500px', maxHeight: '85vh', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+            <h2 style={{ marginBottom: '1rem', flexShrink: 0 }}>{editingId ? 'Edit Product' : 'Add Product'}</h2>
+            <form onSubmit={handleSave} style={{ overflowY: 'auto', paddingRight: '0.5rem', flex: 1, minHeight: 0 }}>
               <div className="form-group">
                 <label className="form-label">Product Name</label>
                 <input className="form-input" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
