@@ -111,7 +111,7 @@ const Products = () => {
                   <td style={{ fontFamily: 'monospace' }}>{product.sku}</td>
                   <td style={{ fontWeight: 500 }}>{product.name}</td>
                   <td>{product.category}</td>
-                  <td>${product.unitPrice.toFixed(2)}</td>
+                  <td>₹{product.unitPrice.toFixed(2)}</td>
                   <td>{product.currentStock}</td>
                   <td>
                     {product.currentStock <= product.minStockAlert ? (

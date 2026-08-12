@@ -366,7 +366,7 @@ const Challans = () => {
                             <td>{item.sku}</td>
                             <td>{item.productName}</td>
                             <td>{item.quantity}</td>
-                            <td>${item.unitPrice.toFixed(2)}</td>
+                            <td>₹{item.unitPrice.toFixed(2)}</td>
                             <td>
                               <button className="btn btn-danger" style={{ padding: '2px 5px', fontSize: '10px' }} onClick={() => {
                                 const newItems = [...items];

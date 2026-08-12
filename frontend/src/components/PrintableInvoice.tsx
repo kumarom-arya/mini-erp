@@ -57,8 +57,8 @@ export const PrintableInvoice = forwardRef<HTMLDivElement, PrintableInvoiceProps
                 <td style={{ padding: '10px' }}>{item.productName}</td>
                 <td style={{ padding: '10px' }}>{item.productSku}</td>
                 <td style={{ padding: '10px', textAlign: 'center' }}>{item.quantity}</td>
-                <td style={{ padding: '10px', textAlign: 'right' }}>${item.unitPrice.toFixed(2)}</td>
-                <td style={{ padding: '10px', textAlign: 'right' }}>${(item.quantity * item.unitPrice).toFixed(2)}</td>
+                <td style={{ padding: '10px', textAlign: 'right' }}>₹{item.unitPrice.toFixed(2)}</td>
+                <td style={{ padding: '10px', textAlign: 'right' }}>₹{(item.quantity * item.unitPrice).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>
@@ -66,25 +66,25 @@ export const PrintableInvoice = forwardRef<HTMLDivElement, PrintableInvoiceProps
 
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <div style={{ width: '350px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0' }}>
               <span>Subtotal:</span>
-              <span>${invoice.totalAmount.toFixed(2)}</span>
+              <span>₹{invoice.totalAmount.toFixed(2)}</span>
             </div>
             {invoice.discount > 0 && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', color: '#e53e3e' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', color: 'red' }}>
                 <span>Discount:</span>
-                <span>-${invoice.discount.toFixed(2)}</span>
+                <span>-₹{invoice.discount.toFixed(2)}</span>
               </div>
             )}
             {invoice.taxAmount > 0 && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0' }}>
                 <span>Tax:</span>
-                <span>${invoice.taxAmount.toFixed(2)}</span>
+                <span>₹{invoice.taxAmount.toFixed(2)}</span>
               </div>
             )}
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderTop: '2px solid #eee', fontWeight: 'bold', fontSize: '18px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderTop: '2px solid #000', fontWeight: 'bold', fontSize: '1.1rem' }}>
               <span>Grand Total:</span>
-              <span>${invoice.grandTotal.toFixed(2)}</span>
+              <span>₹{invoice.grandTotal.toFixed(2)}</span>
             </div>
             {(() => {
               const totalPaid = invoice.payments?.reduce((sum: number, p: any) => sum + p.amount, 0) || 0;
@@ -92,13 +92,13 @@ export const PrintableInvoice = forwardRef<HTMLDivElement, PrintableInvoiceProps
               if (totalPaid > 0) {
                 return (
                   <>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', color: '#059669' }}>
-                      <span>Amount Paid:</span>
-                      <span>-${totalPaid.toFixed(2)}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: '0.9rem', color: '#059669' }}>
+                      <span>Total Paid:</span>
+                      <span>-₹{totalPaid.toFixed(2)}</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderTop: '2px solid #eee', fontWeight: 'bold', fontSize: '18px', color: balanceDue > 0 ? '#e53e3e' : '#059669' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontWeight: 'bold', fontSize: '1rem', color: balanceDue > 0 ? '#dc2626' : '#059669', borderTop: '1px dashed #ccc', marginTop: '4px' }}>
                       <span>Balance Due:</span>
-                      <span>${Math.max(0, balanceDue).toFixed(2)}</span>
+                      <span>₹{Math.max(0, balanceDue).toFixed(2)}</span>
                     </div>
                   </>
                 );

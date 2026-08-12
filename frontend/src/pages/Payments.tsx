@@ -38,7 +38,7 @@ const Payments = () => {
   const handleCreatePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (parseFloat(amount) > maxAmount) {
-      alert(`Payment amount cannot exceed the remaining balance of $${maxAmount.toFixed(2)}`);
+      alert(`Payment amount cannot exceed the remaining balance of ₹${maxAmount.toFixed(2)}`);
       return;
     }
 
@@ -97,7 +97,7 @@ const Payments = () => {
                   <td>{payment.invoice?.customer?.name}</td>
                   <td>{payment.invoice?.invoiceNo}</td>
                   <td style={{ fontWeight: 600, color: 'var(--color-success)' }}>
-                    +${payment.amount.toFixed(2)}
+                    +₹{payment.amount.toFixed(2)}
                   </td>
                   <td>{payment.paymentMode}</td>
                   <td>{payment.referenceNo || '-'}</td>
@@ -134,7 +134,7 @@ const Payments = () => {
                     const remaining = inv.grandTotal - paid;
                     return (
                       <option key={inv.id} value={inv.id}>
-                        {inv.invoiceNo} - {inv.customer?.name} (Due: ${remaining.toFixed(2)})
+                        {inv.invoiceNo} - {inv.customer?.name} (Due: ₹{remaining.toFixed(2)})
                       </option>
                     );
                   })}
@@ -153,7 +153,7 @@ const Payments = () => {
                   value={amount} 
                   onChange={(e) => setAmount(e.target.value)} 
                 />
-                {maxAmount > 0 && <small style={{ color: 'var(--color-text-muted)', marginTop: '0.25rem', display: 'block' }}>Maximum allowed: ${maxAmount.toFixed(2)}</small>}
+                {maxAmount > 0 && <small style={{ color: 'var(--color-text-muted)', marginTop: '0.25rem', display: 'block' }}>Maximum allowed: ₹{maxAmount.toFixed(2)}</small>}
               </div>
 
               <div className="form-group mt-4">

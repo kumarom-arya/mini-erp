@@ -76,7 +76,7 @@ const Invoices = () => {
                   <td>{invoice.customer?.name}</td>
                   <td>{invoice.challan?.challanNo || 'N/A'}</td>
                   <td>{new Date(invoice.createdAt).toLocaleDateString()}</td>
-                  <td>${invoice.grandTotal.toFixed(2)}</td>
+                  <td>₹{invoice.grandTotal.toFixed(2)}</td>
                   <td>
                     <span className={`badge ${invoice.status === 'PAID' ? 'badge-success' : invoice.status === 'UNPAID' ? 'badge-danger' : 'badge-warning'}`}>
                       {invoice.status}

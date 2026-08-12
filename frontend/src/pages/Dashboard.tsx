@@ -39,7 +39,7 @@ const Dashboard = () => {
           <div style={{ overflow: 'hidden' }}>
             <h3 style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Total Revenue</h3>
             <p style={{ margin: 0, fontSize: '1.35rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
-              ${data.financial.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              ₹{data.financial.totalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
         </div>
@@ -51,7 +51,7 @@ const Dashboard = () => {
           <div style={{ overflow: 'hidden' }}>
             <h3 style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Outstanding Amount</h3>
             <p style={{ margin: 0, fontSize: '1.35rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
-              ${data.financial.outstandingAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              ₹{data.financial.outstandingAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
         </div>
