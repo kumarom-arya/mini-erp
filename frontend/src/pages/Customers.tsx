@@ -147,61 +147,67 @@ const Customers = () => {
 
       {showModal && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '600px', maxHeight: '85vh', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-            <h2 style={{ marginBottom: '1rem', flexShrink: 0 }}>{editingId ? 'Edit Customer' : 'Add Customer'}</h2>
-            <form onSubmit={handleSubmit} style={{ overflowY: 'auto', paddingRight: '0.5rem', flex: 1, minHeight: 0 }}>
-              <div className="flex gap-4">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="form-label">Contact Name <span style={{ color: 'red' }}>*</span></label>
-                  <input className="form-input" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+          <div className="modal-content" style={{ maxWidth: '600px', maxHeight: '85vh', padding: '1.5rem', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ flexShrink: 0, marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ margin: 0 }}>{editingId ? 'Edit Customer' : 'Add Customer'}</h2>
+              <button onClick={closeModal} style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontSize: '1.5rem', cursor: 'pointer', lineHeight: 1 }}>&times;</button>
+            </div>
+            
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+              <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, paddingRight: '0.5rem' }}>
+                <div className="flex gap-4">
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">Contact Name <span style={{ color: 'red' }}>*</span></label>
+                    <input className="form-input" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                  </div>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">Business / Company Name</label>
+                    <input className="form-input" value={formData.businessName} onChange={e => setFormData({...formData, businessName: e.target.value})} />
+                  </div>
                 </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="form-label">Business / Company Name</label>
-                  <input className="form-input" value={formData.businessName} onChange={e => setFormData({...formData, businessName: e.target.value})} />
+
+                <div className="flex gap-4 mt-2">
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">Mobile No. <span style={{ color: 'red' }}>*</span></label>
+                    <input className="form-input" required value={formData.mobile} onChange={e => setFormData({...formData, mobile: e.target.value})} />
+                  </div>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">Email Address</label>
+                    <input className="form-input" type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                  </div>
+                </div>
+                
+                <div className="form-group mt-2">
+                  <label className="form-label">GSTIN / Tax Number</label>
+                  <input className="form-input" value={formData.gstNumber} onChange={e => setFormData({...formData, gstNumber: e.target.value})} placeholder="e.g. 29ABCDE1234F1Z5" />
+                </div>
+
+                <div className="form-group mt-2">
+                  <label className="form-label">Billing/Shipping Address</label>
+                  <textarea className="form-input" rows={3} value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} placeholder="Full address..." />
+                </div>
+
+                <div className="flex gap-4 mt-2">
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">Customer Type</label>
+                    <select className="form-input" value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})}>
+                      <option value="RETAIL">Retail</option>
+                      <option value="WHOLESALE">Wholesale</option>
+                      <option value="DISTRIBUTOR">Distributor</option>
+                    </select>
+                  </div>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">Status</label>
+                    <select className="form-input" value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
+                      <option value="LEAD">Lead</option>
+                      <option value="ACTIVE">Active</option>
+                      <option value="INACTIVE">Inactive</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex gap-4 mt-2">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="form-label">Mobile No. <span style={{ color: 'red' }}>*</span></label>
-                  <input className="form-input" required value={formData.mobile} onChange={e => setFormData({...formData, mobile: e.target.value})} />
-                </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="form-label">Email Address</label>
-                  <input className="form-input" type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-                </div>
-              </div>
-              
-              <div className="form-group mt-2">
-                <label className="form-label">GSTIN / Tax Number</label>
-                <input className="form-input" value={formData.gstNumber} onChange={e => setFormData({...formData, gstNumber: e.target.value})} placeholder="e.g. 29ABCDE1234F1Z5" />
-              </div>
-
-              <div className="form-group mt-2">
-                <label className="form-label">Billing/Shipping Address</label>
-                <textarea className="form-input" rows={3} value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} placeholder="Full address..." />
-              </div>
-
-              <div className="flex gap-4 mt-2">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="form-label">Customer Type</label>
-                  <select className="form-input" value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})}>
-                    <option value="RETAIL">Retail</option>
-                    <option value="WHOLESALE">Wholesale</option>
-                    <option value="DISTRIBUTOR">Distributor</option>
-                  </select>
-                </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="form-label">Status</label>
-                  <select className="form-input" value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
-                    <option value="LEAD">Lead</option>
-                    <option value="ACTIVE">Active</option>
-                    <option value="INACTIVE">Inactive</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div className="flex justify-between mt-6 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
+              <div style={{ flexShrink: 0, marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between' }}>
                 <button type="button" className="btn btn-secondary" onClick={closeModal}>Cancel</button>
                 <button type="submit" className="btn btn-primary">{editingId ? 'Save Changes' : 'Save Customer'}</button>
               </div>

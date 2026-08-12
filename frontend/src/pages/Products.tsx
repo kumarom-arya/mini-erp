@@ -134,38 +134,45 @@ const Products = () => {
 
       {showModal && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '500px', maxHeight: '85vh', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-            <h2 style={{ marginBottom: '1rem', flexShrink: 0 }}>{editingId ? 'Edit Product' : 'Add Product'}</h2>
-            <form onSubmit={handleSave} style={{ overflowY: 'auto', paddingRight: '0.5rem', flex: 1, minHeight: 0 }}>
-              <div className="form-group">
-                <label className="form-label">Product Name</label>
-                <input className="form-input" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
-              </div>
-              <div className="flex gap-4">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="form-label">SKU</label>
-                  <input className="form-input" required value={formData.sku} onChange={e => setFormData({...formData, sku: e.target.value})} />
+          <div className="modal-content" style={{ maxWidth: '500px', maxHeight: '85vh', padding: '1.5rem', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ flexShrink: 0, marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ margin: 0 }}>{editingId ? 'Edit Product' : 'Add Product'}</h2>
+              <button onClick={closeModal} style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontSize: '1.5rem', cursor: 'pointer', lineHeight: 1 }}>&times;</button>
+            </div>
+
+            <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+              <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, paddingRight: '0.5rem' }}>
+                <div className="form-group">
+                  <label className="form-label">Product Name</label>
+                  <input className="form-input" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
                 </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="form-label">Category</label>
-                  <input className="form-input" required value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} />
+                <div className="flex gap-4">
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">SKU</label>
+                    <input className="form-input" required value={formData.sku} onChange={e => setFormData({...formData, sku: e.target.value})} />
+                  </div>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">Category</label>
+                    <input className="form-input" required value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">Unit Price</label>
+                    <input className="form-input" type="number" step="0.01" required value={formData.unitPrice} onChange={e => setFormData({...formData, unitPrice: e.target.value})} />
+                  </div>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">Current Stock</label>
+                    <input className="form-input" type="number" required value={formData.currentStock} onChange={e => setFormData({...formData, currentStock: e.target.value})} />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Minimum Stock Alert</label>
+                  <input className="form-input" type="number" required value={formData.minStockAlert} onChange={e => setFormData({...formData, minStockAlert: e.target.value})} />
                 </div>
               </div>
-              <div className="flex gap-4">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="form-label">Unit Price</label>
-                  <input className="form-input" type="number" step="0.01" required value={formData.unitPrice} onChange={e => setFormData({...formData, unitPrice: e.target.value})} />
-                </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="form-label">Current Stock</label>
-                  <input className="form-input" type="number" required value={formData.currentStock} onChange={e => setFormData({...formData, currentStock: e.target.value})} />
-                </div>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Minimum Stock Alert</label>
-                <input className="form-input" type="number" required value={formData.minStockAlert} onChange={e => setFormData({...formData, minStockAlert: e.target.value})} />
-              </div>
-              <div className="flex justify-between mt-4">
+
+              <div style={{ flexShrink: 0, marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between' }}>
                 <button type="button" className="btn btn-secondary" onClick={closeModal}>Cancel</button>
                 <button type="submit" className="btn btn-primary">{editingId ? 'Update Product' : 'Save Product'}</button>
               </div>
