@@ -114,6 +114,30 @@ const Settings = () => {
           </button>
         </form>
       </div>
+
+      <div className="card mt-6" style={{ border: '1px solid var(--color-danger)', padding: '1.5rem' }}>
+        <h3 style={{ color: 'var(--color-danger)', marginTop: 0, marginBottom: '0.5rem' }}>Danger Zone: Reset All Data</h3>
+        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
+          This will permanently delete all Customers, Products, Challans, Invoices, Payments, and Company Settings so you can start completely fresh.
+        </p>
+        <button 
+          className="btn btn-secondary" 
+          style={{ borderColor: 'var(--color-danger)', color: 'var(--color-danger)' }}
+          onClick={async () => {
+            if (window.confirm('ARE YOU SURE? This will PERMANENTLY DELETE all company data, customers, invoices, and products!')) {
+              try {
+                const res = await api.post('/settings/reset');
+                alert(res.data.message || 'All company data deleted!');
+                window.location.reload();
+              } catch (err: any) {
+                alert(err.response?.data?.error || 'Failed to reset data');
+              }
+            }
+          }}
+        >
+          Reset System & Start Fresh
+        </button>
+      </div>
     </div>
   );
 };

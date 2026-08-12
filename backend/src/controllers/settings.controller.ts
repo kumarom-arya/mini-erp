@@ -35,3 +35,22 @@ export const updateSettings = async (req: Request, res: Response): Promise<void>
     res.status(400).json({ error: 'Failed to update settings', details: error.message });
   }
 };
+
+export const resetSystemData = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Delete in order to satisfy FK constraints
+    await prisma.payment.deleteMany();
+    await prisma.invoice.deleteMany();
+    await prisma.challanEditRequest.deleteMany();
+    await prisma.challanItem.deleteMany();
+    await prisma.challan.deleteMany();
+    await prisma.stockMovement.deleteMany();
+    await prisma.product.deleteMany();
+    await prisma.customer.deleteMany();
+    await prisma.settings.deleteMany();
+
+    res.json({ message: 'All company data has been completely reset!' });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Failed to reset system data', details: error.message });
+  }
+};

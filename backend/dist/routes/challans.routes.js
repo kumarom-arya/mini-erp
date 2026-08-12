@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const challans_controller_1 = require("../controllers/challans.controller");
+const auth_middleware_1 = require("../middlewares/auth.middleware");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authenticateJWT);
+router.get('/', challans_controller_1.getChallans);
+router.get('/:id', challans_controller_1.getChallanById);
+router.post('/', (0, auth_middleware_1.requireRole)(['ADMIN', 'SALES']), challans_controller_1.createChallan);
+router.put('/:id/status', (0, auth_middleware_1.requireRole)(['ADMIN', 'SALES']), challans_controller_1.updateChallanStatus);
+const edit_requests_controller_1 = require("../controllers/edit-requests.controller");
+router.post('/:challanId/edit-request', (0, auth_middleware_1.requireRole)(['ADMIN', 'SALES']), edit_requests_controller_1.createEditRequest);
+exports.default = router;
