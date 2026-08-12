@@ -1,0 +1,172 @@
+{
+	"info": {
+		"_postman_id": "c1f7a1b8-93a0-4c3e-8e8e-d9b9b5f3a1a0",
+		"name": "Mini ERP API",
+		"description": "API documentation for the Mini ERP system.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Seed Data",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/seed",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"seed"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Customers",
+			"item": [
+				{
+					"name": "Get Customers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/customers",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customers"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Get Products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Challans",
+			"item": [
+				{
+					"name": "Get Challans",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/challans",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"challans"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Analytics",
+			"item": [
+				{
+					"name": "Get Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/analytics",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"analytics"
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://your-backend-url.onrender.com/api"
+		},
+		{
+			"key": "token",
+			"value": "your_jwt_token_here"
+		}
+	]
+}
