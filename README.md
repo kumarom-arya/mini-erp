@@ -2,7 +2,7 @@
 
 A full-stack, responsive, and beautifully designed Mini ERP (Enterprise Resource Planning) system for small to medium businesses. The system manages customers, products/inventory, sales challans, invoices, payments, and employees with role-based access control.
 
-**Live Demo:** [https://mini-erp-git-main-om-portfolio1.vercel.app/](https://mini-erp-git-main-om-portfolio1.vercel.app/)
+**Live Demo:** [https://mini-erp-git-main-om-portfolio1.vercel.app/](https://mini-erp-one-sigma.vercel.app/)
 
 ## ✨ Features
 
