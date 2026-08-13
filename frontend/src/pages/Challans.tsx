@@ -107,13 +107,21 @@ const Challans = () => {
     try {
       if (editModeId) {
         await api.post(`/challans/${editModeId}/edit-request`, {
-          items: items.map(i => ({ productId: i.productId, quantity: i.quantity }))
+          items: items.map(i => ({ 
+            productId: i.productId, 
+            quantity: i.quantity,
+            productName: i.productName,
+            sku: i.sku || i.productSku
+          }))
         });
         alert('Edit request submitted successfully.');
       } else {
         await api.post('/challans', {
           customerId: parseInt(selectedCustomer),
-          items: items.map(i => ({ productId: i.productId, quantity: i.quantity })),
+          items: items.map(i => ({ 
+            productId: i.productId, 
+            quantity: i.quantity 
+          })),
           status
         });
       }
